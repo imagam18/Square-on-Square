@@ -1,110 +1,93 @@
-
 import math
 import matplotlib.pyplot as plt
 from matplotlib.patches import Polygon
 
 
-# Function to calculate square corners
-def get_square_corner(x, y, size):
+def get_rotated_square(cx, cy, angle_degrees, size=1):
+
     half = size / 2
 
     corners = [
-        (x - half, y - half),  # Bottom-left
-        (x + half, y - half),  # Bottom-right
-        (x + half, y + half),  # Top-right
-        (x - half, y + half)   # Top-left
+        (-half, -half),
+        (half, -half),
+        (half, half),
+        (-half, half)
     ]
 
-    return corners
-
-
-# Function to rotate square
-def rotate_square(corners, angle):
-
-    rotated_corners = []
-
-    # Convert degrees into radians
-    angle = math.radians(angle)
+    angle = math.radians(angle_degrees)
 
     cos_a = math.cos(angle)
     sin_a = math.sin(angle)
 
-    # Rotate all four corners
+    rotated_corners = []
+
     for x, y in corners:
 
         new_x = x * cos_a - y * sin_a
         new_y = x * sin_a + y * cos_a
 
-        rotated_corners.append((new_x, new_y))
+        final_x = cx + new_x
+        final_y = cy + new_y
+
+        rotated_corners.append((final_x, final_y))
 
     return rotated_corners
 
 
-# Create a unit square
-corners = get_square_corner(0, 0, 1)
+# Five squares ki information
+squares = [
+    {"x": 0, "y": 0, "angle": 0},
+    {"x": 2, "y": 0, "angle": 30},
+    {"x": 4, "y": 0, "angle": 45},
+    {"x": 0, "y": 2, "angle": 60},
+    {"x": 2, "y": 2, "angle": 90}
+]
 
 
-# Rotate the square by 30 degrees
-rotated_corners = rotate_square(corners, 30)
+
+fig, ax = plt.subplots(figsize=(8, 8))
 
 
-# Display original corners
-print("Original square corners:")
+# Har square ko draw karo
+for i, square in enumerate(squares):
 
-for corner in corners:
-    print(corner)
+    corners = get_rotated_square(
+        square["x"],
+        square["y"],
+        square["angle"]
+    )
 
+    polygon = Polygon(
+        corners,
+        closed=True,
+        fill=False,
+        linewidth=2,
+        label=f"Square {i + 1}"
+    )
 
-# Display rotated corners
-print("\nRotated square corners:")
+    ax.add_patch(polygon)
 
-for corner in rotated_corners:
-    print(corner)
+    # Square ka center show karo
+    ax.plot(square["x"], square["y"], "ro")
 
-
-# Create figure and axes
-fig, ax = plt.subplots()
-
-
-# Draw original square
-square = Polygon(
-    corners,
-    closed=True,
-    fill=False,
-    edgecolor="blue",
-    linewidth=2,
-    label="Original Square"
-)
-
-ax.add_patch(square)
-
-
-# Draw rotated square
-rotated_square = Polygon(
-    rotated_corners,
-    closed=True,
-    fill=False,
-    edgecolor="red",
-    linewidth=2,
-    label="Rotated Square"
-)
-
-ax.add_patch(rotated_square)
+    # Square ka number show karo
+    ax.text(
+        square["x"],
+        square["y"],
+        str(i + 1)
+    )
 
 
-# Mark the center
-ax.plot(0, 0, "ro")
+ax.set_xlim(-2, 6)
+ax.set_ylim(-2, 4)
 
-
-# Configure the graph
-ax.set_xlim(-2, 2)
-ax.set_ylim(-2, 2)
 ax.set_aspect("equal")
 ax.grid(True)
 
-plt.title("Original vs Rotated Unit Square")
-plt.xlabel("X-axis")
-plt.ylabel("Y-axis")
-plt.legend()
+ax.set_title("Multiple Rotated Squares")
+ax.set_xlabel("X-axis")
+ax.set_ylabel("Y-axis")
+
+ax.legend()
 
 plt.show()
